@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Hall Ticket - {{ ticket.hall_ticket_number }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .college-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .ticket-details {
+            margin: 20px 0;
+            border: 1px solid #000;
+            padding: 20px;
+        }
+        .student-info {
+            margin-bottom: 20px;
+        }
+        .student-details {
+            width: 100%;
+        }
+        .exam-info {
+            margin-bottom: 20px;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 12px;
+        }
+        .subject-list {
+            margin-top: 10px;
+        }
+        .subject-item {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #ccc;
+        }
+        .subject-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="college-name">SIES GRADUATE SCHOOL OF TECHNOLOGY</div>
+        <h2>Hall Ticket</h2>
+    </div>
+
+    <div class="ticket-details">
+        <div class="student-info">
+            <div class="student-details">
+                <h3>Student Information</h3>
+                <p><strong>Name:</strong> {{ ticket.student.admin.get_full_name }}</p>
+                <p><strong>Course:</strong> {{ ticket.student.course.name }}</p>
+            </div>
+        </div>
+
+        <div class="exam-info">
+            <h3>Exam Information</h3>
+            <p><strong>Hall Ticket No:</strong> {{ ticket.hall_ticket_number }}</p>
+            <p><strong>Exam Name:</strong> {{ ticket.exam.name }}</p>
+            <p><strong>Hall:</strong> {{ ticket.exam.hall.name }}</p>
+            <p><strong>Seat No:</strong> {{ ticket.seat_number }}</p>
+            <p><strong>Bench No:</strong> {{ ticket.bench_number }}</p>
+            
+            <h4>Subjects</h4>
+            <div class="subject-list">
+                {% for exam_subject in ticket.exam.exam_subjects.all %}
+                <div class="subject-item">
+                    <p><strong>Subject:</strong> {{ exam_subject.subject.name }}</p>
+                    <p><strong>Date:</strong> {{ exam_subject.date|date:"d M Y" }}</p>
+                    <p><strong>Time:</strong> {{ exam_subject.start_time|time:"H:i" }} - {{ exam_subject.end_time|time:"H:i" }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>This is an electronically generated hall ticket. No signature is required.</p>
+        <p>Please bring this hall ticket along with your college ID card to the examination hall.</p>
+    </div>
+</body>
+</html> 

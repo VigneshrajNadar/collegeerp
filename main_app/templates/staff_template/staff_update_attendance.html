@@ -1,0 +1,359 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- Alert for messages -->
+                <div id="messageAlert" style="display: none;" class="alert alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <span id="messageText"></span>
+                </div>
+
+                <div class="card card-dark">
+                    <div class="card-header">
+                        <h3 class="card-title">{{page_title}}</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Subject <span class="text-danger">*</span></label>
+                            <select class="form-control" name="subject" id="subject" required>
+                                <option value="">Select Subject</option>
+                                {% for subject in subjects %}
+                                <option value="{{ subject.id }}">{{ subject.name }} ({{ subject.course.name }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Session <span class="text-danger">*</span></label>
+                            <select class="form-control" name="session" id="session" required>
+                                <option value="">Select Session</option>
+                                {% for session in sessions %}
+                                <option value="{{ session.id }}">{{ session }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Attendance Date <span class="text-danger">*</span></label>
+                            <select class="form-control" name="attendance_date" id="attendance_date" required>
+                                <option value="">Select Date</option>
+                            </select>
+                        </div>
+                               
+                            <div class="form-group">
+                            <button type="button" class="btn btn-primary" id="fetch_students">
+                                <i class="fas fa-search"></i> Fetch Students
+                            </button>
+                            </div>
+
+                        <div id="student_data" style="display: none;">
+                            <hr>
+                            <h4>Student List</h4>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th class="text-center">Attendance</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="student_list">
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="form-group mt-3">
+                                <button type="button" class="btn btn-success" id="save_attendance">
+                                    <i class="fas fa-save"></i> Update Attendance
+                                </button>
+                                <button type="button" class="btn btn-secondary ml-2" id="select_all">
+                                    <i class="fas fa-check-square"></i> Select All
+                                </button>
+                                <button type="button" class="btn btn-secondary ml-2" id="deselect_all">
+                                    <i class="fas fa-square"></i> Deselect All
+                                </button>
+                            </div>
+                        </div>
+                    </div>  
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% block custom_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to show alert messages
+    function showMessage(message, type) {
+        var messageText = document.getElementById('messageText');
+        var messageAlert = document.getElementById('messageAlert');
+        
+        messageText.textContent = message;
+        messageAlert.className = 'alert alert-' + type + ' alert-dismissible';
+        messageAlert.style.display = 'block';
+        
+        // Auto hide after 5 seconds
+        setTimeout(function() {
+            messageAlert.style.display = 'none';
+        }, 5000);
+    }
+
+    // Function to update attendance dates dropdown
+    function updateAttendanceDates() {
+        var subject = document.getElementById('subject').value;
+        var session = document.getElementById('session').value;
+        var dateSelect = document.getElementById('attendance_date');
+        
+        if (!subject || !session) {
+            dateSelect.innerHTML = '<option value="">Select Subject and Session First</option>';
+            return;
+        }
+
+        // Show loading state
+        dateSelect.innerHTML = '<option value="">Loading dates...</option>';
+        dateSelect.disabled = true;
+
+        // Create form data
+        var formData = new FormData();
+        formData.append('subject', subject);
+        formData.append('session', session);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+        // Make the request
+        fetch("{% url 'get_attendance_dates' %}", {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin'
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('[DEBUG] Attendance dates:', data);
+            
+            var html = '<option value="">Select Date</option>';
+            if (Array.isArray(data) && data.length > 0) {
+                data.forEach(function(item) {
+                    html += `<option value="${item.id}">${item.date}</option>`;
+                });
+                showMessage(`Found ${data.length} attendance records`, 'success');
+            } else {
+                html = '<option value="">No attendance records found</option>';
+                showMessage('No attendance records found for selected subject and session', 'warning');
+            }
+            dateSelect.innerHTML = html;
+            dateSelect.disabled = false;
+        })
+        .catch(error => {
+            console.error('[DEBUG] Error:', error);
+            dateSelect.innerHTML = '<option value="">Error loading dates</option>';
+            dateSelect.disabled = false;
+            showMessage('Error loading attendance dates: ' + error.message, 'danger');
+        });
+    }
+
+    // Function to fetch students
+    function fetchStudents() {
+        var attendanceDate = document.getElementById('attendance_date').value;
+        var studentList = document.getElementById('student_list');
+        var studentData = document.getElementById('student_data');
+
+        console.log('[DEBUG] Fetching students for attendance date:', attendanceDate);
+
+        if (!attendanceDate) {
+            showMessage('Please select an attendance date', 'warning');
+            return;
+        }
+
+        // Show loading state
+        studentList.innerHTML = '<tr><td colspan="2" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading students...</td></tr>';
+        studentData.style.display = 'block';
+
+        // Create form data
+        var formData = new FormData();
+        formData.append('attendance_date_id', attendanceDate);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+        console.log('[DEBUG] Sending request with attendance_date_id:', attendanceDate);
+
+        // Make the request
+        fetch("{% url 'get_student_attendance' %}", {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            console.log('[DEBUG] Response status:', response.status);
+            return response.text().then(text => {
+                console.log('[DEBUG] Raw response:', text);
+                if (text) {
+                    try {
+                        const data = JSON.parse(text);
+                        if (!response.ok) {
+                            throw new Error(data.error || `Server returned ${response.status}`);
+                        }
+                        return data;
+                    } catch (e) {
+                        console.error('[DEBUG] JSON parse error:', e);
+                        throw new Error('Invalid response format from server');
+                    }
+                } else {
+                    throw new Error('Empty response from server');
+                }
+            });
+        })
+        .then(data => {
+            console.log('[DEBUG] Parsed data:', data);
+            
+            if (!Array.isArray(data)) {
+                throw new Error('Invalid response format: expected an array');
+            }
+            
+            if (data.length === 0) {
+                studentList.innerHTML = '<tr><td colspan="2" class="text-center">No students found</td></tr>';
+                showMessage('No students found for the selected date', 'warning');
+                return;
+            }
+
+            var html = '';
+            data.forEach(function(student) {
+                if (student && student.id !== undefined && student.name) {
+                    html += `
+                        <tr>
+                            <td>${student.name}</td>
+                            <td class="text-center">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input attendance-checkbox" 
+                                        id="attendance_${student.id}" 
+                                        name="student_data[]" 
+                                        value="${student.id}" 
+                                        ${student.status ? 'checked' : ''}>
+                                    <label class="custom-control-label" 
+                                        for="attendance_${student.id}">Present</label>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }
+            });
+
+            if (html) {
+                studentList.innerHTML = html;
+                showMessage(`Successfully loaded ${data.length} students`, 'success');
+                } else {
+                studentList.innerHTML = '<tr><td colspan="2" class="text-center">No valid student data found</td></tr>';
+                showMessage('No valid student data found', 'warning');
+            }
+        })
+        .catch(error => {
+            console.error('[DEBUG] Error:', error);
+            studentList.innerHTML = '<tr><td colspan="2" class="text-center text-danger">Error loading students</td></tr>';
+            showMessage('Error loading students: ' + error.message, 'danger');
+            studentData.style.display = 'none';  // Hide the student data section on error
+        });
+    }
+
+    // Event listeners
+    document.getElementById('subject').addEventListener('change', updateAttendanceDates);
+    document.getElementById('session').addEventListener('change', updateAttendanceDates);
+    document.getElementById('fetch_students').addEventListener('click', fetchStudents);
+
+    // Event listeners for select/deselect all
+    document.getElementById('select_all').addEventListener('click', function() {
+        document.querySelectorAll('.attendance-checkbox').forEach(checkbox => {
+            checkbox.checked = true;
+        });
+    });
+
+    document.getElementById('deselect_all').addEventListener('click', function() {
+        document.querySelectorAll('.attendance-checkbox').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+    });
+
+    // Event listener for save attendance
+    document.getElementById('save_attendance').addEventListener('click', function() {
+        var attendanceDate = document.getElementById('attendance_date').value;
+        var checkedStudents = [];
+        
+        document.querySelectorAll('.attendance-checkbox').forEach(checkbox => {
+            checkedStudents.push({
+                id: checkbox.value,
+                status: checkbox.checked
+            });
+        });
+
+        if (checkedStudents.length === 0) {
+            showMessage('No students found to update attendance', 'warning');
+            return;
+        }
+
+        var button = this;
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+        // Create form data
+        var formData = new FormData();
+        formData.append('date', attendanceDate);
+        formData.append('student_ids', JSON.stringify(checkedStudents));
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+        console.log('[DEBUG] Sending update request:', {
+            date: attendanceDate,
+            students: checkedStudents
+        });
+
+        // Make the request
+        fetch("{% url 'update_attendance' %}", {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            console.log('[DEBUG] Response status:', response.status);
+            return response.text().then(text => {
+                console.log('[DEBUG] Raw response:', text);
+                try {
+                    const data = JSON.parse(text);
+                    if (!response.ok) {
+                        throw new Error(data.error || `Server returned ${response.status}`);
+                    }
+                    return data;
+                } catch (e) {
+                    console.error('[DEBUG] JSON parse error:', e);
+                    throw new Error('Invalid response format from server');
+                }
+            });
+        })
+        .then(data => {
+            console.log('[DEBUG] Update successful:', data);
+            showMessage(data.message || 'Attendance updated successfully!', 'success');
+            
+            // Clear form
+            document.getElementById('subject').value = '';
+            document.getElementById('session').value = '';
+            document.getElementById('attendance_date').innerHTML = '<option value="">Select Subject and Session First</option>';
+            document.getElementById('student_data').style.display = 'none';
+        })
+        .catch(error => {
+            console.error('[DEBUG] Error:', error);
+            showMessage('Error updating attendance: ' + error.message, 'danger');
+        })
+        .finally(() => {
+            button.disabled = false;
+            button.innerHTML = '<i class="fas fa-save"></i> Update Attendance';
+        });
+    });
+});
+</script>
+{% endblock custom_js %}

@@ -1,0 +1,70 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<div class="content-wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Result Sheet</h1>
+                </div>
+                <div class="col-sm-6">
+                    <a href="{% url 'staff_download_result' subject.id semester academic_year %}" class="btn btn-primary float-right">
+                        <i class="fas fa-download"></i> Download PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">{{ subject.name }} - {{ semester }} Semester ({{ academic_year }})</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Roll No.</th>
+                                            <th>Student Name</th>
+                                            <th>Internal Marks</th>
+                                            <th>External Marks</th>
+                                            <th>Practical Marks</th>
+                                            <th>Total Marks</th>
+                                            <th>Grade</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for result in results %}
+                                        <tr>
+                                            <td>{{ result.student.admin.email }}</td>
+                                            <td>{{ result.student.admin.first_name }} {{ result.student.admin.last_name }}</td>
+                                            <td>{{ result.internal_marks }}</td>
+                                            <td>{{ result.external_marks }}</td>
+                                            <td>{{ result.practical_marks }}</td>
+                                            <td>{{ result.total_marks }}</td>
+                                            <td>{{ result.grade }}</td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="7" class="text-center">No results found</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock content %} 

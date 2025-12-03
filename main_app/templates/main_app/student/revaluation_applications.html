@@ -1,0 +1,53 @@
+{% extends 'main_app/base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="card-title">My Revaluation Applications</h3>
+            <a href="{% url 'student_apply_revaluation' %}" class="btn btn-primary">Apply for Revaluation</a>
+        </div>
+        <div class="card-body">
+            {% if applications %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Semester</th>
+                                <th>Current Marks</th>
+                                <th>Application Date</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for application in applications %}
+                            <tr>
+                                <td>{{ application.subject.name }}</td>
+                                <td>{{ application.semester }}</td>
+                                <td>{{ application.current_marks }}</td>
+                                <td>{{ application.application_date|date:"d M Y" }}</td>
+                                <td>
+                                    {% if application.status == 'pending' %}
+                                        <span class="badge badge-warning">Pending</span>
+                                    {% elif application.status == 'approved' %}
+                                        <span class="badge badge-success">Approved</span>
+                                    {% else %}
+                                        <span class="badge badge-danger">Rejected</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ application.remarks|default:"-" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    No revaluation applications found. You can apply for revaluation if you have failed a subject or scored between 35-40 marks.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

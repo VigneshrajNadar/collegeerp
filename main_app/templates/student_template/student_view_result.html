@@ -1,0 +1,90 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-dark">
+                    <div class="card-header">
+                        <h3 class="card-title">{{page_title}}</h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="GET" class="mb-4">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Semester</label>
+                                        <input type="text" name="semester" value="{{ semester }}" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Academic Year</label>
+                                        <input type="text" name="academic_year" value="{{ academic_year }}" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>&nbsp;</label>
+                                        <button type="submit" class="btn btn-primary btn-block">Filter</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Subject</th>
+                                        <th>Internal Marks</th>
+                                        <th>External Marks</th>
+                                        <th>Practical Marks</th>
+                                        <th>Total Marks</th>
+                                        <th>Grade</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for result in results %}
+                                    <tr>
+                                        <td>{{ result.subject.name }}</td>
+                                        <td>{{ result.internal_marks }}</td>
+                                        <td>{{ result.external_marks }}</td>
+                                        <td>{{ result.practical_marks }}</td>
+                                        <td>{{ result.internal_marks|add:result.external_marks|add:result.practical_marks }}</td>
+                                        <td>
+                                            {% with total=result.internal_marks|add:result.external_marks|add:result.practical_marks %}
+                                                {% if total >= 90 %}
+                                                    A+
+                                                {% elif total >= 80 %}
+                                                    A
+                                                {% elif total >= 70 %}
+                                                    B+
+                                                {% elif total >= 60 %}
+                                                    B
+                                                {% elif total >= 50 %}
+                                                    C
+                                                {% else %}
+                                                    F
+                                                {% endif %}
+                                            {% endwith %}
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center">No results found</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

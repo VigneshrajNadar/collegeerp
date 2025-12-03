@@ -1,0 +1,230 @@
+{% load static %}
+<style>
+    .main-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        z-index: 810;
+        transition: transform .3s ease-in-out,width .3s ease-in-out;
+        width: 250px;
+        background: linear-gradient(180deg, #4e73df 10%, #224abe 100%);
+    }
+    .sidebar {
+        height: calc(100% - 3.5rem);
+        overflow-y: auto;
+        overflow-x: hidden;
+        position: relative;
+        display: block;
+        top: 0;
+        height: 100%;
+        padding-top: .5rem;
+        padding-bottom: 0;
+        box-sizing: border-box;
+    }
+    .nav-sidebar .nav-item {
+        margin-bottom: 0;
+        padding: 0 1rem;
+    }
+    .nav-sidebar .nav-link {
+        padding: .75rem 1rem;
+        display: flex;
+        align-items: center;
+        color: rgba(255, 255, 255, 0.8);
+    }
+    .nav-sidebar .nav-link:hover {
+        color: #fff;
+        background: rgba(255,255,255,.1);
+    }
+    .nav-sidebar .nav-link.active {
+        color: #fff;
+        background: rgba(255,255,255,.1);
+    }
+    .nav-sidebar .nav-icon {
+        margin-right: .5rem;
+        text-align: center;
+        width: 1.6rem;
+    }
+    .brand-link {
+        border-bottom: 1px solid rgba(255,255,255,.1);
+        background: rgba(0,0,0,.1);
+    }
+    .brand-text {
+        color: #fff;
+    }
+    .user-panel {
+        border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    .user-panel .info a {
+        color: #fff;
+    }
+</style>
+<!-- Main Sidebar Container -->
+<aside class="main-sidebar sidebar-dark-info elevation-4">
+    <!-- Brand Logo -->
+    <a href="{% url 'admin_home' %}" class="brand-link">
+        <img src="{% static 'dist/img/virusx.png' %}" alt="SIES GST Logo" class="brand-image"
+             style="height: 60px; width: 60px; margin: 0 auto; display: block; border-radius: 50%; object-fit: contain; background-color: white; padding: 5px;">
+        <span class="brand-text font-weight-light" style="display: block; text-align: center; margin-top: 10px; font-size: 13px; line-height: 1.2;">SIES GST Admin Panel</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar" style="background-image: linear-gradient(to right top, #0b3574, #033f91, #004aae, #0054cc, #125eeb);">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+                <img src="{{ request.user.profile_pic }}" class="img-circle elevation-2" alt="User Image">
+            </div>
+            <div class="info">
+                <a href="{% url 'admin_view_profile' %}" class="d-block">{{ user.first_name }} {{ user.last_name }}</a>
+                <a href="{% url 'admin_view_profile' %}" class="d-block">{{ user.email }}</a>
+            </div>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <li class="nav-item">
+                    <a href="{% url 'admin_home' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_home' %}active{% endif %}">
+                        <i class="nav-icon fas fa-home"></i>
+                        <p>Home</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_add_staff' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_add_staff' %}active{% endif %}">
+                        <i class="nav-icon fas fa-user-plus"></i>
+                        <p>Add Staff</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_manage_staff' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_manage_staff' %}active{% endif %}">
+                        <i class="nav-icon fas fa-chalkboard-teacher"></i>
+                        <p>Manage Staff</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_add_course' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_add_course' %}active{% endif %}">
+                        <i class="nav-icon fas fa-book"></i>
+                        <p>Add Course</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_manage_course' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_manage_course' %}active{% endif %}">
+                        <i class="nav-icon fas fa-list"></i>
+                        <p>Manage Course</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_add_subject' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_add_subject' %}active{% endif %}">
+                        <i class="nav-icon fas fa-bookmark"></i>
+                        <p>Add Subject</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_manage_subject' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_manage_subject' %}active{% endif %}">
+                        <i class="nav-icon fas fa-list-alt"></i>
+                        <p>Manage Subject</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_add_student' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_add_student' %}active{% endif %}">
+                        <i class="nav-icon fas fa-user-graduate"></i>
+                        <p>Add Student</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_manage_student' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_manage_student' %}active{% endif %}">
+                        <i class="nav-icon fas fa-users-cog"></i>
+                        <p>Manage Student</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_view_attendance' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_view_attendance' %}active{% endif %}">
+                        <i class="nav-icon fas fa-calendar-check"></i>
+                        <p>View Attendance</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_student_feedback_message' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_student_feedback_message' %}active{% endif %}">
+                        <i class="nav-icon fas fa-comment"></i>
+                        <p>Student Feedback</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_staff_feedback_message' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_staff_feedback_message' %}active{% endif %}">
+                        <i class="nav-icon fas fa-comments"></i>
+                        <p>Staff Feedback</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_student_leave_view' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_student_leave_view' %}active{% endif %}">
+                        <i class="nav-icon fas fa-calendar-minus"></i>
+                        <p>Student Leave</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_staff_leave_view' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_staff_leave_view' %}active{% endif %}">
+                        <i class="nav-icon fas fa-calendar-times"></i>
+                        <p>Staff Leave</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_view_profile' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_view_profile' %}active{% endif %}">
+                        <i class="nav-icon fas fa-user"></i>
+                        <p>View Profile</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_view_notification_student' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_view_notification_student' %}active{% endif %}">
+                        <i class="nav-icon fas fa-bell"></i>
+                        <p>Student Notifications</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_view_notification_staff' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_view_notification_staff' %}active{% endif %}">
+                        <i class="nav-icon fas fa-bell"></i>
+                        <p>Staff Notifications</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_add_hall' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_add_hall' %}active{% endif %}">
+                        <i class="nav-icon fas fa-building"></i>
+                        <p>Add Hall</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_manage_hall' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_manage_hall' %}active{% endif %}">
+                        <i class="nav-icon fas fa-building"></i>
+                        <p>Manage Hall</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_add_exam' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_add_exam' %}active{% endif %}">
+                        <i class="nav-icon fas fa-file-alt"></i>
+                        <p>Add Exam</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_manage_exam' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_manage_exam' %}active{% endif %}">
+                        <i class="nav-icon fas fa-tasks"></i>
+                        <p>Manage Exam</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_manage_kt_applications' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_manage_kt_applications' %}active{% endif %}">
+                        <i class="nav-icon fas fa-redo"></i>
+                        <p>Manage KT Applications</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_manage_revaluation_applications' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_manage_revaluation_applications' %}active{% endif %}">
+                        <i class="nav-icon fas fa-search"></i>
+                        <p>Manage Revaluation</p>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+</aside> 

@@ -1,0 +1,210 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="content-wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Add Result</h1>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Add Student Result</h3>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" id="resultForm">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label>Subject</label>
+                                    <select class="form-control" name="subject" id="subject" required>
+                                        <option value="">Select Subject</option>
+                                        {% for subject in subjects %}
+                                            <option value="{{ subject.id }}">{{ subject.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Student</label>
+                                    <select class="form-control" name="student" id="student" required>
+                                        <option value="">Select Student</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Semester</label>
+                                    <select class="form-control" name="semester" required>
+                                        <option value="">Select Semester</option>
+                                        <option value="1">Semester 1</option>
+                                        <option value="2">Semester 2</option>
+                                        <option value="3">Semester 3</option>
+                                        <option value="4">Semester 4</option>
+                                        <option value="5">Semester 5</option>
+                                        <option value="6">Semester 6</option>
+                                        <option value="7">Semester 7</option>
+                                        <option value="8">Semester 8</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Academic Year</label>
+                                    <input type="text" class="form-control" name="academic_year" 
+                                           placeholder="e.g., 2023-2024" required>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Internal Marks (Max: 20)</label>
+                                            <input type="number" class="form-control" name="internal_marks" 
+                                                   min="0" max="20" step="0.5" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>External Marks (Max: 60)</label>
+                                            <input type="number" class="form-control" name="external_marks" 
+                                                   min="0" max="60" step="0.5" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Practical Marks (Max: 20)</label>
+                                            <input type="number" class="form-control" name="practical_marks" 
+                                                   min="0" max="20" step="0.5" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary">Add Result</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#subject').change(function() {
+            var subjectId = $(this).val();
+            console.log('Subject changed:', subjectId);  // Debug log
+            
+            if (subjectId) {
+                console.log('Making AJAX request for subject:', subjectId);  // Debug log
+                $.ajax({
+                    url: '{% url "get_students" %}',
+                    type: 'POST',
+                    data: {
+                        subject: subjectId,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        console.log('Received response:', response);  // Debug log
+                        var studentSelect = $('#student');
+                        studentSelect.empty();
+                        studentSelect.append('<option value="">Select Student</option>');
+                        
+                        if (response && response.length > 0) {
+                            console.log('Found students:', response.length);  // Debug log
+                            response.forEach(function(student) {
+                                console.log('Adding student:', student.name);  // Debug log
+                                var option = $('<option></option>')
+                                    .val(student.id)
+                                    .text(student.name)
+                                    .data('roll-number', student.roll_number);
+                                studentSelect.append(option);
+                            });
+                        } else {
+                            console.log('No students found');  // Debug log
+                            studentSelect.append('<option value="">No students found</option>');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching students:', error);
+                        console.error('Status:', status);
+                        console.error('Response:', xhr.responseText);
+                        console.error('XHR:', xhr);  // Debug log
+                        alert('Error fetching students. Please try again.');
+                        $('#student').empty().append('<option value="">Error loading students</option>');
+                    }
+                });
+            } else {
+                $('#student').empty().append('<option value="">Select Student</option>');
+            }
+        });
+
+        $('#student').change(function() {
+            var studentId = $(this).val();
+            var subjectId = $('#subject').val();
+            
+            if (studentId && subjectId) {
+                $.ajax({
+                    url: '{% url "fetch_student_result" %}',
+                    type: 'POST',
+                    data: {
+                        student: studentId,
+                        subject: subjectId,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        try {
+                            var result = JSON.parse(response);
+                            if (result.error) {
+                                console.error('Error:', result.error);
+                                return;
+                            }
+                            
+                            // Populate the form with existing result
+                            $('input[name="internal_marks"]').val(result.internal_marks);
+                            $('input[name="external_marks"]').val(result.external_marks);
+                            $('input[name="practical_marks"]').val(result.practical_marks);
+                        } catch (e) {
+                            console.error('Error parsing response:', e);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching result:', error);
+                    }
+                });
+            }
+        });
+
+        // Form validation
+        $('#resultForm').submit(function(e) {
+            var internal = parseFloat($('input[name="internal_marks"]').val());
+            var external = parseFloat($('input[name="external_marks"]').val());
+            var practical = parseFloat($('input[name="practical_marks"]').val());
+
+            if (internal > 20 || external > 60 || practical > 20) {
+                e.preventDefault();
+                alert('Marks exceed maximum allowed values. Please check and try again.');
+                return false;
+            }
+
+            if (internal < 0 || external < 0 || practical < 0) {
+                e.preventDefault();
+                alert('Marks cannot be negative. Please check and try again.');
+                return false;
+            }
+        });
+    });
+</script>
+{% endblock %}
+
+{% endblock %} 

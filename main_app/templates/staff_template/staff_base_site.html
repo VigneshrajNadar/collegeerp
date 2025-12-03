@@ -1,0 +1,65 @@
+<!-- Sidebar Menu -->
+<nav class="mt-2">
+    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <li class="nav-item">
+            <a href="{% url 'staff_home' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_home' %}active{% endif %}">
+                <i class="nav-icon fas fa-tachometer-alt"></i>
+                <p>Dashboard</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'staff_take_attendance' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_take_attendance' %}active{% endif %}">
+                <i class="nav-icon fas fa-calendar-check"></i>
+                <p>Take Attendance</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'staff_update_attendance' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_update_attendance' %}active{% endif %}">
+                <i class="nav-icon fas fa-calendar-alt"></i>
+                <p>Update Attendance</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'staff_add_result' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_add_result' %}active{% endif %}">
+                <i class="nav-icon fas fa-plus"></i>
+                <p>Add Result</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'staff_generate_result' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_generate_result' %}active{% endif %}">
+                <i class="nav-icon fas fa-file-alt"></i>
+                <p>Generate Result</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'staff_apply_leave' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_apply_leave' %}active{% endif %}">
+                <i class="nav-icon fas fa-envelope"></i>
+                <p>Apply Leave</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'staff_feedback' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_feedback' %}active{% endif %}">
+                <i class="nav-icon fas fa-comments"></i>
+                <p>Feedback</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'staff_view_notification' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_view_notification' %}active{% endif %}">
+                <i class="nav-icon fas fa-bell"></i>
+                <p>View Notifications</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'staff_view_profile' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_view_profile' %}active{% endif %}">
+                <i class="nav-icon fas fa-user"></i>
+                <p>View Profile</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'user_logout' %}" class="nav-link">
+                <i class="nav-icon fas fa-sign-out-alt"></i>
+                <p>Logout</p>
+            </a>
+        </li>
+    </ul>
+</nav> 

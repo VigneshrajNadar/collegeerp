@@ -1,0 +1,55 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="content-wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>My Notifications</h1>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Notifications List</h3>
+                        </div>
+                        <div class="card-body">
+                            {% if notifications %}
+                                <div class="timeline">
+                                    {% for notification in notifications %}
+                                        <div class="time-label">
+                                            <span class="bg-info">{{ notification.created_at|date:"d M Y" }}</span>
+                                        </div>
+                                        <div>
+                                            <i class="fas {% if notification.notification_type == 'kt' %}fa-redo bg-warning{% elif notification.notification_type == 'revaluation' %}fa-search bg-info{% else %}fa-bell bg-primary{% endif %}"></i>
+                                            <div class="timeline-item">
+                                                <span class="time"><i class="fas fa-clock"></i> {{ notification.created_at|time:"H:i" }}</span>
+                                                <h3 class="timeline-header">{{ notification.title }}</h3>
+                                                <div class="timeline-body">
+                                                    {{ notification.message }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="text-center">
+                                    <p>No notifications found.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %} 

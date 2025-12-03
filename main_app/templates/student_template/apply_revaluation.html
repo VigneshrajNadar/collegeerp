@@ -1,0 +1,86 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}Apply for Revaluation{% endblock page_title %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Apply for Revaluation</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if messages %}
+                        <div class="messages">
+                            {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4>Eligible Subjects</h4>
+                                {% if revaluation_subjects %}
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <label>Select Subject</label>
+                                        <select name="subject" class="form-control" required>
+                                            <option value="">Select Subject</option>
+                                            {% for subject in revaluation_subjects %}
+                                            <option value="{{ subject.id }}">{{ subject.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Apply for Revaluation</button>
+                                </form>
+                                {% else %}
+                                <p class="text-success">You have no subjects eligible for revaluation!</p>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <h4>Existing Applications</h4>
+                                {% if existing_applications %}
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Subject</th>
+                                                <th>Current Marks</th>
+                                                <th>Status</th>
+                                                <th>Applied Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for application in existing_applications %}
+                                            <tr>
+                                                <td>{{ application.subject.name }}</td>
+                                                <td>{{ application.current_marks }}</td>
+                                                <td>
+                                                    <span class="badge badge-{% if application.status == 'pending' %}warning{% elif application.status == 'approved' %}success{% else %}danger{% endif %}">
+                                                        {{ application.status|title }}
+                                                    </span>
+                                                </td>
+                                                <td>{{ application.created_at|date:"d/m/Y" }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <p>No existing applications.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %} 

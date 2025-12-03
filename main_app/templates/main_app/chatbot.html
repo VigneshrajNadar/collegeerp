@@ -1,0 +1,615 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+
+{% block page_title %}
+    College Help Chatbot
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="card h-100 chat-sidebar">
+                <div class="card-header gradient-header text-white">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar-circle me-2 pulse">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0">College Help</h5>
+                            <small class="text-white-50">Your Virtual Assistant</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <!-- Quick Actions -->
+                    <div class="p-3 border-bottom">
+                        <h6 class="text-primary mb-2">
+                            <i class="fas fa-bolt me-2"></i>Quick Actions
+                        </h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-gradient-primary btn-sm quick-action">
+                                <i class="fas fa-calendar-check me-1"></i>Attendance
+                            </button>
+                            <button class="btn btn-gradient-primary btn-sm quick-action">
+                                <i class="fas fa-chart-line me-1"></i>Results
+                            </button>
+                            <button class="btn btn-gradient-primary btn-sm quick-action">
+                                <i class="fas fa-money-bill-wave me-1"></i>Fees
+                            </button>
+                            <button class="btn btn-gradient-primary btn-sm quick-action">
+                                <i class="fas fa-book me-1"></i>Library
+                            </button>
+                            <button class="btn btn-gradient-primary btn-sm quick-action">
+                                <i class="fas fa-building me-1"></i>Hostel
+                            </button>
+                            <button class="btn btn-gradient-primary btn-sm quick-action">
+                                <i class="fas fa-laptop-code me-1"></i>Technical
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Categories -->
+                    <div class="p-3">
+                        <h6 class="text-primary mb-2">
+                            <i class="fas fa-th-large me-2"></i>Categories
+                        </h6>
+                        <div class="list-group list-group-flush">
+                            <a href="#" class="list-group-item list-group-item-action d-flex align-items-center category-item" data-category="academic">
+                                <i class="fas fa-graduation-cap category-icon academic"></i>
+                                <span>Academic</span>
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action d-flex align-items-center category-item" data-category="administrative">
+                                <i class="fas fa-file-alt category-icon administrative"></i>
+                                <span>Administrative</span>
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action d-flex align-items-center category-item" data-category="library">
+                                <i class="fas fa-book category-icon library"></i>
+                                <span>Library</span>
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action d-flex align-items-center category-item" data-category="hostel">
+                                <i class="fas fa-building category-icon hostel"></i>
+                                <span>Hostel</span>
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action d-flex align-items-center category-item" data-category="technical">
+                                <i class="fas fa-laptop-code category-icon technical"></i>
+                                <span>Technical</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Recent Questions -->
+                    <div class="p-3 border-top">
+                        <h6 class="text-primary mb-2">
+                            <i class="fas fa-history me-2"></i>Recent Questions
+                        </h6>
+                        <div class="recent-questions">
+                            <!-- Will be populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="col-md-9">
+            <div class="card h-100 chat-main">
+                <div class="card-header gradient-header text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-circle me-2 pulse">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">College Assistant</h6>
+                                <small class="text-white-50">Online</small>
+                            </div>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-link text-white" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-history me-2"></i>Chat History</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-question-circle me-2"></i>Help</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <!-- Chat Container -->
+                    <div class="chat-container" id="chatContainer">
+                        <!-- Welcome Message -->
+                        <div class="welcome-message p-4 text-center">
+                            <div class="avatar-circle mx-auto mb-3 pulse">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <h5 class="text-primary mb-2">Welcome to College Help!</h5>
+                            <p class="text-muted">I'm your virtual assistant. How can I help you today?</p>
+                            <div class="row g-2 mt-4">
+                                <div class="col-md-4">
+                                    <div class="quick-tip">
+                                        <i class="fas fa-calendar-check text-primary mb-2"></i>
+                                        <h6>Check Attendance</h6>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="quick-tip">
+                                        <i class="fas fa-chart-line text-primary mb-2"></i>
+                                        <h6>View Results</h6>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="quick-tip">
+                                        <i class="fas fa-money-bill-wave text-primary mb-2"></i>
+                                        <h6>Pay Fees</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input Area -->
+                    <div class="chat-input p-3 border-top">
+                        <div class="input-group">
+                            <button class="btn btn-outline-primary" type="button" id="emojiButton">
+                                <i class="fas fa-smile"></i>
+                            </button>
+                            <button class="btn btn-outline-primary" type="button" id="attachmentButton">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                            <input type="text" class="form-control" id="userInput" placeholder="Type your message...">
+                            <button class="btn btn-gradient-primary" id="sendButton">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .gradient-header {
+        background: linear-gradient(45deg, #2193b0, #6dd5ed);
+    }
+    .btn-gradient-primary {
+        background: linear-gradient(45deg, #2193b0, #6dd5ed);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    .btn-gradient-primary:hover {
+        background: linear-gradient(45deg, #1a7a94, #5ab8d0);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .chat-container {
+        height: calc(100vh - 250px);
+        overflow-y: auto;
+        background-color: #f8f9fa;
+        background-image: linear-gradient(45deg, #f8f9fa 25%, #ffffff 25%, #ffffff 50%, #f8f9fa 50%, #f8f9fa 75%, #ffffff 75%, #ffffff 100%);
+        background-size: 20px 20px;
+    }
+    .message {
+        margin: 10px;
+        max-width: 70%;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+    .user-message {
+        margin-left: auto;
+        background: linear-gradient(45deg, #2193b0, #6dd5ed);
+        color: white;
+        padding: 10px 15px;
+        border-radius: 15px 15px 0 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .bot-message {
+        margin-right: auto;
+        background-color: white;
+        padding: 10px 15px;
+        border-radius: 15px 15px 15px 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-left: 4px solid #2193b0;
+    }
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(45deg, #2193b0, #6dd5ed);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+    .typing-indicator {
+        display: flex;
+        align-items: center;
+        padding: 10px 15px;
+        background-color: white;
+        border-radius: 15px 15px 15px 0;
+        width: fit-content;
+        margin: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .typing-dot {
+        width: 8px;
+        height: 8px;
+        background: linear-gradient(45deg, #2193b0, #6dd5ed);
+        border-radius: 50%;
+        margin: 0 2px;
+        animation: typing 1s infinite;
+    }
+    .quick-tip {
+        background-color: white;
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        border: 1px solid #e9ecef;
+    }
+    .quick-tip:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        border-color: #2193b0;
+    }
+    .category-item {
+        transition: all 0.3s ease;
+        border: none;
+        padding: 12px 15px;
+        margin-bottom: 5px;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+    }
+    .category-item:hover {
+        transform: translateX(5px);
+        background-color: #e9ecef;
+    }
+    .category-item.active {
+        background-color: #e3f2fd;
+        border-left: 4px solid #2193b0;
+    }
+    .category-icon {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        margin-right: 12px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+    .category-icon.academic {
+        background-color: #e3f2fd;
+        color: #2193b0;
+    }
+    .category-icon.administrative {
+        background-color: #f3e5f5;
+        color: #9c27b0;
+    }
+    .category-icon.library {
+        background-color: #e8f5e9;
+        color: #4caf50;
+    }
+    .category-icon.hostel {
+        background-color: #fff3e0;
+        color: #ff9800;
+    }
+    .category-icon.technical {
+        background-color: #e0f2f1;
+        color: #00bcd4;
+    }
+    .category-item:hover .category-icon {
+        transform: scale(1.1);
+    }
+    .category-item span {
+        font-size: 0.95rem;
+        color: #495057;
+    }
+    .category-item:hover span {
+        color: #2193b0;
+    }
+    .chat-sidebar {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .chat-main {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    @keyframes typing {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .emoji-picker {
+        position: absolute;
+        bottom: 100%;
+        right: 0;
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        display: none;
+    }
+    .emoji-picker.show {
+        display: block;
+    }
+    .emoji-button {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        padding: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .emoji-button:hover {
+        transform: scale(1.2);
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatContainer = document.getElementById('chatContainer');
+    const userInput = document.getElementById('userInput');
+    const sendButton = document.getElementById('sendButton');
+    const quickActions = document.querySelectorAll('.quick-action');
+    const recentQuestions = document.querySelector('.recent-questions');
+    const emojiButton = document.getElementById('emojiButton');
+    const attachmentButton = document.getElementById('attachmentButton');
+
+    // Add welcome message
+    addMessage("Hello! I'm your college assistant. How can I help you today?", 'bot');
+
+    // Function to add message to chat
+    function addMessage(message, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}-message`;
+        messageDiv.textContent = message;
+        chatContainer.appendChild(messageDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        
+        // Add to recent questions if it's a user message
+        if (sender === 'user') {
+            addToRecentQuestions(message);
+        }
+    }
+
+    // Function to add to recent questions
+    function addToRecentQuestions(question) {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'list-group-item list-group-item-action';
+        questionDiv.innerHTML = `
+            <i class="fas fa-history text-muted me-2"></i>
+            <small>${question}</small>
+        `;
+        recentQuestions.insertBefore(questionDiv, recentQuestions.firstChild);
+        
+        // Keep only last 5 questions
+        if (recentQuestions.children.length > 5) {
+            recentQuestions.removeChild(recentQuestions.lastChild);
+        }
+    }
+
+    // Function to show typing indicator
+    function showTypingIndicator() {
+        const indicator = document.createElement('div');
+        indicator.className = 'typing-indicator';
+        indicator.innerHTML = `
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+        `;
+        chatContainer.appendChild(indicator);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        return indicator;
+    }
+
+    // Function to remove typing indicator
+    function removeTypingIndicator(indicator) {
+        indicator.remove();
+    }
+
+    // Function to send message
+    async function sendMessage() {
+        const message = userInput.value.trim();
+        if (message) {
+            addMessage(message, 'user');
+            userInput.value = '';
+
+            // Show typing indicator
+            const typingIndicator = showTypingIndicator();
+
+            try {
+                const response = await fetch('/chatbot/query/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ query: message })
+                });
+
+                const data = await response.json();
+                
+                // Remove typing indicator
+                removeTypingIndicator(typingIndicator);
+
+                if (data.status === 'success') {
+                    // Add slight delay for more natural feel
+                    setTimeout(() => {
+                        addMessage(data.answer, 'bot');
+                    }, 500);
+                } else {
+                    addMessage("Sorry, I couldn't process your request. Please try again.", 'bot');
+                }
+            } catch (error) {
+                removeTypingIndicator(typingIndicator);
+                addMessage("Sorry, there was an error. Please try again.", 'bot');
+            }
+        }
+    }
+
+    // Event listeners
+    sendButton.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    // Quick action buttons
+    quickActions.forEach(button => {
+        button.addEventListener('click', function() {
+            userInput.value = this.textContent.trim();
+            sendMessage();
+        });
+    });
+
+    // Emoji picker functionality
+    emojiButton.addEventListener('click', function() {
+        const emojis = ['😊', '👍', '👋', '📚', '🎓', '💡', '❓', '✅', '⚠️', '📅'];
+        const picker = document.createElement('div');
+        picker.className = 'emoji-picker';
+        emojis.forEach(emoji => {
+            const button = document.createElement('button');
+            button.className = 'emoji-button';
+            button.textContent = emoji;
+            button.addEventListener('click', () => {
+                userInput.value += emoji;
+                picker.remove();
+            });
+            picker.appendChild(button);
+        });
+        this.parentElement.appendChild(picker);
+        setTimeout(() => picker.classList.add('show'), 0);
+    });
+
+    // Attachment button functionality
+    attachmentButton.addEventListener('click', function() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.pdf,.doc,.docx,.jpg,.jpeg,.png';
+        input.click();
+        input.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                addMessage(`Attached file: ${this.files[0].name}`, 'user');
+            }
+        });
+    });
+
+    // Function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Category functionality
+    const categoryItems = document.querySelectorAll('.category-item');
+    categoryItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Remove active class from all items
+            categoryItems.forEach(i => i.classList.remove('active'));
+            
+            // Add active class to clicked item
+            this.classList.add('active');
+            
+            // Get category name
+            const category = this.dataset.category;
+            
+            // Show typing indicator
+            const typingIndicator = showTypingIndicator();
+            
+            // Send category query
+            setTimeout(() => {
+                removeTypingIndicator(typingIndicator);
+                addMessage(`Here are some common questions about ${category}:`, 'bot');
+                
+                // Add category-specific questions
+                const questions = {
+                    academic: [
+                        "How do I check my attendance?",
+                        "When are the exam dates?",
+                        "How do I apply for leave?",
+                        "What is the grading system?"
+                    ],
+                    administrative: [
+                        "How do I get a bonafide certificate?",
+                        "What documents do I need for ID card?",
+                        "How to apply for transfer certificate?",
+                        "What is the fee structure?"
+                    ],
+                    library: [
+                        "What are the library timings?",
+                        "How many books can I borrow?",
+                        "How to access online resources?",
+                        "What are the library rules?"
+                    ],
+                    hostel: [
+                        "How to apply for hostel?",
+                        "What are the hostel fees?",
+                        "What facilities are available?",
+                        "What are the hostel rules?"
+                    ],
+                    technical: [
+                        "How to reset my password?",
+                        "How to access student portal?",
+                        "What to do if portal is not working?",
+                        "How to contact IT support?"
+                    ]
+                };
+                
+                // Add questions as clickable buttons
+                const questionsDiv = document.createElement('div');
+                questionsDiv.className = 'category-questions mt-2';
+                questions[category].forEach(question => {
+                    const button = document.createElement('button');
+                    button.className = 'btn btn-light btn-sm m-1 category-question';
+                    button.textContent = question;
+                    button.addEventListener('click', () => {
+                        userInput.value = question;
+                        sendMessage();
+                    });
+                    questionsDiv.appendChild(button);
+                });
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message bot-message';
+                messageDiv.appendChild(questionsDiv);
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 1000);
+        });
+    });
+});
+</script>
+{% endblock %} 

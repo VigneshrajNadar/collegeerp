@@ -1,0 +1,196 @@
+{% load static %}
+<style>
+    .main-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        z-index: 810;
+        transition: transform .3s ease-in-out,width .3s ease-in-out;
+        width: 250px;
+        background: linear-gradient(180deg, #4e73df 10%, #224abe 100%);
+    }
+    .sidebar {
+        height: calc(100% - 3.5rem);
+        overflow-y: auto;
+        overflow-x: hidden;
+        position: relative;
+        display: block;
+        top: 0;
+        height: 100%;
+        padding-top: .5rem;
+        padding-bottom: 0;
+        box-sizing: border-box;
+    }
+    .nav-sidebar .nav-item {
+        margin-bottom: 0;
+        padding: 0 1rem;
+    }
+    .nav-sidebar .nav-link {
+        padding: .75rem 1rem;
+        display: flex;
+        align-items: center;
+        color: rgba(255, 255, 255, 0.8);
+    }
+    .nav-sidebar .nav-link:hover {
+        color: #fff;
+        background: rgba(255,255,255,.1);
+    }
+    .nav-sidebar .nav-link.active {
+        color: #fff;
+        background: rgba(255,255,255,.1);
+    }
+    .nav-sidebar .nav-icon {
+        margin-right: .5rem;
+        text-align: center;
+        width: 1.6rem;
+    }
+    .brand-link {
+        border-bottom: 1px solid rgba(255,255,255,.1);
+        background: rgba(0,0,0,.1);
+    }
+    .brand-text {
+        color: #fff;
+    }
+    .user-panel {
+        border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    .user-panel .info a {
+        color: #fff;
+    }
+    .logout-btn {
+        margin-top: auto;
+        padding: 1rem;
+        border-top: 1px solid rgba(255,255,255,.1);
+    }
+    .logout-btn .nav-link {
+        color: #ff6b6b;
+    }
+    .logout-btn .nav-link:hover {
+        color: #ff5252;
+        background: rgba(255,107,107,.1);
+    }
+</style>
+<!-- Main Sidebar Container -->
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="{% url 'staff_home' %}" class="brand-link">
+        <img src="{% static 'dist/img/virusx.png' %}" alt="SIES GST Logo" class="brand-image"
+             style="height: 60px; width: 60px; margin: 0 auto; display: block; border-radius: 50%; object-fit: contain; background-color: white; padding: 5px;">
+        <span class="brand-text font-weight-light" style="display: block; text-align: center; margin-top: 10px; font-size: 13px; line-height: 1.2;">SIES GST Staff Panel</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar" style="background-image: linear-gradient(to right top, #0b3574, #033f91, #004aae, #0054cc, #125eeb);">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+                <img src="{{ request.user.profile_pic }}" class="img-circle elevation-2" alt="User Image">
+            </div>
+            <div class="info">
+                <a href="{% url 'staff_view_profile' %}" class="d-block">{{ user.first_name }} {{ user.last_name }}</a>
+                <a href="{% url 'staff_view_profile' %}" class="d-block">{{ user.email }}</a>
+            </div>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <li class="nav-item">
+                    <a href="{% url 'staff_home' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_home' %}active{% endif %}">
+                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <p>Home</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'staff_take_attendance' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_take_attendance' %}active{% endif %}">
+                        <i class="nav-icon fas fa-calendar-check"></i>
+                        <p>Take Attendance</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'staff_update_attendance' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_update_attendance' %}active{% endif %}">
+                        <i class="nav-icon fas fa-calendar-alt"></i>
+                        <p>Update Attendance</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    {% url 'staff_add_result' as staff_add_result %}
+                    <a href="{{staff_add_result}}"
+                        class="nav-link {% if staff_add_result == request.path %} active {% endif %}">
+                        <i class="nav-icon fas fa-poll"></i>
+                        <p>
+                            Add Result
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    {% url 'staff_generate_result' as staff_generate_result %}
+                    <a href="{{staff_generate_result}}"
+                        class="nav-link {% if staff_generate_result == request.path %} active {% endif %}">
+                        <i class="nav-icon fas fa-file-alt"></i>
+                        <p>
+                            Generate Result
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    {% url 'edit_student_result' as edit_student_result %}
+                    <a href="{{edit_student_result}}"
+                        class="nav-link {% if edit_student_result == request.path %} active {% endif %}">
+                        <i class="nav-icon fas fa-edit"></i>
+                        <p>
+                            Edit Result
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'staff_apply_leave' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_apply_leave' %}active{% endif %}">
+                        <i class="nav-icon fas fa-envelope"></i>
+                        <p>Apply Leave</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'staff_feedback' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_feedback' %}active{% endif %}">
+                        <i class="nav-icon fas fa-comment"></i>
+                        <p>Feedback</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'staff_view_notification' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_view_notification' %}active{% endif %}">
+                        <i class="nav-icon fas fa-bell"></i>
+                        <p>View Notifications</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'staff_view_profile' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_view_profile' %}active{% endif %}">
+                        <i class="nav-icon fas fa-user"></i>
+                        <p>View Profile</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'staff_manage_kt_applications' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_manage_kt_applications' %}active{% endif %}">
+                        <i class="nav-icon fas fa-redo"></i>
+                        <p>Manage KT Applications</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'staff_manage_revaluation_applications' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_manage_revaluation_applications' %}active{% endif %}">
+                        <i class="nav-icon fas fa-search"></i>
+                        <p>Manage Revaluation</p>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+        
+        <!-- Logout Button -->
+        <div class="logout-btn">
+            <a href="{% url 'user_logout' %}" class="nav-link">
+                <i class="nav-icon fas fa-sign-out-alt"></i>
+                <p>Logout</p>
+            </a>
+        </div>
+    </div>
+    <!-- /.sidebar -->
+</aside> 

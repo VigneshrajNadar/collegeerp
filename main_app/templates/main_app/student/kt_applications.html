@@ -1,0 +1,49 @@
+{% extends 'main_app/base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">My KT Applications</h3>
+            <a href="{% url 'student_apply_kt' %}" class="btn btn-primary float-right">Apply for KT</a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Semester</th>
+                            <th>Application Date</th>
+                            <th>Status</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for application in applications %}
+                        <tr>
+                            <td>{{ application.subject.name }}</td>
+                            <td>{{ application.semester }}</td>
+                            <td>{{ application.application_date|date:"d M Y" }}</td>
+                            <td>
+                                {% if application.status == 'pending' %}
+                                    <span class="badge badge-warning">Pending</span>
+                                {% elif application.status == 'approved' %}
+                                    <span class="badge badge-success">Approved</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Rejected</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ application.remarks|default:"-" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">No KT applications found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

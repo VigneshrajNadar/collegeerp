@@ -1,0 +1,89 @@
+{% extends 'main_app/base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Add New Exam</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="name">Exam Name</label>
+                    <input type="text" class="form-control" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="course">Course</label>
+                    <select class="form-control" name="course" id="course" required>
+                        <option value="">Select Course</option>
+                        {% for course in courses %}
+                        <option value="{{ course.id }}">{{ course.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="hall">Exam Hall</label>
+                    <select class="form-control" name="hall" required>
+                        <option value="">Select Hall</option>
+                        {% for hall in halls %}
+                        <option value="{{ hall.id }}">{{ hall.name }} (Capacity: {{ hall.capacity }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Subjects and Schedule</label>
+                    <div id="subjects-container">
+                        <div class="subject-entry border p-3 mb-3">
+                            <div class="form-group">
+                                <label>Subject</label>
+                                <select class="form-control" name="subjects[]" required>
+                                    <option value="">Select Subject</option>
+                                    {% for subject in subjects %}
+                                    <option value="{{ subject.id }}">{{ subject.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Date</label>
+                                <input type="date" class="form-control" name="dates[]" required min="{{ today|date:'Y-m-d' }}">
+                            </div>
+                            <div class="form-row">
+                                <div class="col">
+                                    <label>Start Time</label>
+                                    <input type="time" class="form-control" name="start_times[]" required>
+                                </div>
+                                <div class="col">
+                                    <label>End Time</label>
+                                    <input type="time" class="form-control" name="end_times[]" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-secondary mt-2" onclick="addSubjectField()">Add Another Subject</button>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Exam</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function addSubjectField() {
+    const container = document.getElementById('subjects-container');
+    const newSubject = container.children[0].cloneNode(true);
+    
+    // Clear the values
+    const selects = newSubject.getElementsByTagName('select');
+    const inputs = newSubject.getElementsByTagName('input');
+    
+    for(let select of selects) {
+        select.value = '';
+    }
+    for(let input of inputs) {
+        input.value = '';
+    }
+    
+    container.appendChild(newSubject);
+}
+</script>
+{% endblock %} 

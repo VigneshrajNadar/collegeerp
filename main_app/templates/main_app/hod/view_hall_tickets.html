@@ -1,0 +1,74 @@
+{% extends 'main_app/base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Hall Tickets for {{ exam.name }}</h3>
+                    <p class="mb-0">{{ exam.course.name }}</p>
+                    <p class="mb-0">Hall: {{ exam.hall.name }}</p>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Hall Ticket No.</th>
+                                    <th>Student Name</th>
+                                    <th>Subjects</th>
+                                    <th>Seat No.</th>
+                                    <th>Bench No.</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ticket in tickets %}
+                                <tr>
+                                    <td>{{ ticket.hall_ticket_number }}</td>
+                                    <td>{{ ticket.student.admin.get_full_name }}</td>
+                                    <td>
+                                        <ul class="list-unstyled mb-0">
+                                            {% for exam_subject in ticket.exam.exam_subjects.all %}
+                                            <li>
+                                                <strong>{{ exam_subject.subject.name }}</strong><br>
+                                                <small>
+                                                    {{ exam_subject.date|date:"d M Y" }}<br>
+                                                    {{ exam_subject.start_time|time:"H:i" }} - {{ exam_subject.end_time|time:"H:i" }}
+                                                </small>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
+                                    <td>{{ ticket.seat_number }}</td>
+                                    <td>{{ ticket.bench_number }}</td>
+                                    <td>
+                                        <button onclick="printHallTicket('hall-ticket-{{ ticket.id }}')" class="btn btn-sm btn-primary">Print</button>
+                                        <a href="{% url 'download_hall_ticket' ticket.id %}" class="btn btn-sm btn-info">Download</a>
+                                        <a href="{% url 'delete_hall_ticket' ticket.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this hall ticket?')">Delete</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center">No hall tickets found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function printHallTicket(elementId) {
+    const printContent = document.getElementById(elementId);
+    const originalContents = document.body.innerHTML;
+    document.body.innerHTML = printContent.innerHTML;
+    window.print();
+    document.body.innerHTML = originalContents;
+}
+</script>
+{% endblock %} 

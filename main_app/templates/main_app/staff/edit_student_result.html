@@ -1,0 +1,190 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+{% block content %}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="card card-dark">
+                        <div class="card-header">
+                            <h3 class="card-title">{{page_title}}</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Subject</label>
+                                {{ form.subject }}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Student</label>
+                                {{ form.student }}
+                            </div>
+
+                            <div class="form-group">
+                                <label>Semester</label>
+                                {{ form.semester }}
+                            </div>
+
+                            <div class="form-group">
+                                <label>Academic Year</label>
+                                {{ form.academic_year }}
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Internal Marks (Max: 20)</label>
+                                        {{ form.internal_marks }}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>External Marks (Max: 60)</label>
+                                        {{ form.external_marks }}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Practical Marks (Max: 20)</label>
+                                        {{ form.practical_marks }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% if form.errors %}
+                            <div class="alert alert-danger">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <p>{{ field.label }}: {{ error }}</p>
+                                    {% endfor %}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary btn-block">Update Result</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% block custom_js %}
+<script>
+    $(document).ready(function () {
+        console.log('Document ready');
+        
+        $("#id_subject").change(function () {
+            console.log('Subject changed');
+            fetchStudents();
+        });
+
+        $("#id_student").change(function () {
+            console.log('Student changed');
+            fetch_student_result();
+        });
+
+        function fetchStudents() {
+            var subject = $("#id_subject").val();
+            console.log('Fetching students for subject:', subject);
+            $("#id_student").html(null);
+            
+            if (!subject) {
+                console.log('No subject selected');
+                return false;
+            }
+            
+            $.ajax({
+                url: "{% url 'get_students' %}",
+                type: 'POST',
+                data: {
+                    subject: subject,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                }
+            }).done(function (response) {
+                console.log('Received response:', response);
+                try {
+                    var json_data = JSON.parse(response);
+                    if (json_data.length < 1) {
+                        console.log('No students found');
+                        alert("No students found for this subject");
+                    } else {
+                        var div_data = "<option value=''>Select Student</option>";
+                        for (key in json_data) {
+                            div_data += "<option value='" + json_data[key]['id'] + "'>" + json_data[key]['name'] + "</option>";
+                        }
+                        $("#id_student").html(div_data);
+                        console.log('Updated student dropdown');
+                    }
+                } catch (e) {
+                    console.error('Error parsing response:', e);
+                    alert("Error parsing student data");
+                }
+            }).fail(function (response, status, error) {
+                console.error('AJAX error:', status, error);
+                console.error('Response:', response);
+                alert("Error in fetching students");
+            });
+        }
+
+        function fetch_student_result() {
+            var student = $("#id_student").val();
+            var subject = $("#id_subject").val();
+            console.log('Fetching result for student:', student, 'subject:', subject);
+            
+            if (!student || !subject) {
+                console.log('Missing student or subject');
+                return false;
+            }
+            
+            $.ajax({
+                url: "{% url 'fetch_student_result' %}",
+                type: 'POST',
+                data: {
+                    student: student,
+                    subject: subject,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                }
+            }).done(function (response) {
+                console.log('Received response:', response);
+                try {
+                    var result = JSON.parse(response);
+                    if (result.error) {
+                        console.error('Error:', result.error);
+                        alert(result.error);
+                        return;
+                    }
+                    
+                    // Populate the form with existing result
+                    $("#id_internal_marks").val(result.internal_marks);
+                    $("#id_external_marks").val(result.external_marks);
+                    $("#id_practical_marks").val(result.practical_marks);
+                    
+                    // Set semester and academic year if they exist
+                    if (result.semester) {
+                        $("#id_semester").val(result.semester);
+                    }
+                    if (result.academic_year) {
+                        $("#id_academic_year").val(result.academic_year);
+                    }
+                    console.log('Form populated with result data');
+                } catch (e) {
+                    console.error('Error parsing response:', e);
+                    alert("Error parsing result data");
+                }
+            }).fail(function (response, status, error) {
+                console.error('AJAX error:', status, error);
+                console.error('Response:', response);
+                alert("Error in fetching student result");
+            });
+        }
+    });
+</script>
+{% endblock custom_js %} 

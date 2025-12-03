@@ -1,0 +1,78 @@
+{% extends 'main_app/base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">My Hall Tickets</h3>
+                </div>
+                <div class="card-body">
+                    {% if tickets %}
+                        {% for ticket in tickets %}
+                        <div class="card mb-4" id="hall-ticket-{{ ticket.id }}">
+                            <div class="card-header">
+                                <h4 class="mb-0">{{ ticket.exam.name }}</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Hall Ticket No:</strong> {{ ticket.hall_ticket_number }}</p>
+                                        <p><strong>Hall:</strong> {{ ticket.exam.hall.name }}</p>
+                                        <p><strong>Seat No:</strong> {{ ticket.seat_number }}</p>
+                                        <p><strong>Bench No:</strong> {{ ticket.bench_number }}</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <h5>Subjects</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Subject</th>
+                                                    <th>Date</th>
+                                                    <th>Time</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for exam_subject in ticket.exam.exam_subjects.all %}
+                                                <tr>
+                                                    <td>{{ exam_subject.subject.name }}</td>
+                                                    <td>{{ exam_subject.date|date:"d M Y" }}</td>
+                                                    <td>{{ exam_subject.start_time|time:"H:i" }} - {{ exam_subject.end_time|time:"H:i" }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <button onclick="printHallTicket('hall-ticket-{{ ticket.id }}')" class="btn btn-primary">Print Hall Ticket</button>
+                                    <a href="{% url 'download_hall_ticket' ticket.id %}" class="btn btn-info">Download Hall Ticket</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="alert alert-info">
+                            No hall tickets available at the moment.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function printHallTicket(elementId) {
+    const printContent = document.getElementById(elementId);
+    const originalContents = document.body.innerHTML;
+    document.body.innerHTML = printContent.innerHTML;
+    window.print();
+    document.body.innerHTML = originalContents;
+}
+</script>
+{% endblock %} 

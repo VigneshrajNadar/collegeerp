@@ -1,0 +1,160 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="content-wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Manage Revaluation Applications</h1>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Revaluation Applications List</h3>
+                        </div>
+                        <div class="card-body">
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert alert-{{ message.tags }}">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                            
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Subject</th>
+                                        <th>Application Date</th>
+                                        <th>Current Marks</th>
+                                        <th>Status</th>
+                                        <th>Remarks</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for application in revaluation_applications %}
+                                        <tr>
+                                            <td>{{ application.student.admin.first_name }} {{ application.student.admin.last_name }}</td>
+                                            <td>{{ application.subject.name }}</td>
+                                            <td>{{ application.created_at|date:"d M Y" }}</td>
+                                            <td>{{ application.current_marks }}</td>
+                                            <td>
+                                                <span class="badge badge-{% if application.status == 'pending' %}warning{% elif application.status == 'approved' %}success{% else %}danger{% endif %}">
+                                                    {{ application.status|title }}
+                                                </span>
+                                            </td>
+                                            <td>{{ application.remarks|default:"-" }}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#updateModal{{ application.id }}">
+                                                    Update Status
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        
+                                        <!-- Update Status Modal -->
+                                        <div class="modal fade" id="updateModal{{ application.id }}" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel{{ application.id }}" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="updateModalLabel{{ application.id }}">Update Revaluation Application Status</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <form method="post" action="{% url 'staff_update_revaluation_status' application.id %}">
+                                                        {% csrf_token %}
+                                                        <div class="modal-body">
+                                                            <div class="form-group">
+                                                                <label for="status{{ application.id }}">Status</label>
+                                                                <select class="form-control" id="status{{ application.id }}" name="status" required>
+                                                                    <option value="pending" {% if application.status == 'pending' %}selected{% endif %}>Pending</option>
+                                                                    <option value="approved" {% if application.status == 'approved' %}selected{% endif %}>Approved</option>
+                                                                    <option value="rejected" {% if application.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                                                                </select>
+                                                            </div>
+                                                            
+                                                            <div class="form-group">
+                                                                <label>Current Marks: {{ application.current_marks }}</label>
+                                                            </div>
+
+                                                            <div class="marks-update-section" style="display: none;">
+                                                                <div class="form-group">
+                                                                    <label for="internal_marks{{ application.id }}">Internal Marks</label>
+                                                                    <input type="number" class="form-control" id="internal_marks{{ application.id }}" name="internal_marks" min="0" max="40" step="0.5">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="external_marks{{ application.id }}">External Marks</label>
+                                                                    <input type="number" class="form-control" id="external_marks{{ application.id }}" name="external_marks" min="0" max="60" step="0.5">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="practical_marks{{ application.id }}">Practical Marks</label>
+                                                                    <input type="number" class="form-control" id="practical_marks{{ application.id }}" name="practical_marks" min="0" max="50" step="0.5">
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label for="remarks{{ application.id }}">Remarks</label>
+                                                                <textarea class="form-control" id="remarks{{ application.id }}" name="remarks" rows="3">{{ application.remarks }}</textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                            <button type="submit" class="btn btn-primary">Update Status</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="7" class="text-center">No revaluation applications found.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+{% block custom_js %}
+<script>
+$(document).ready(function() {
+    // Show/hide marks update section based on status selection
+    $('select[name="status"]').on('change', function() {
+        var marksSection = $(this).closest('.modal-body').find('.marks-update-section');
+        if ($(this).val() === 'approved') {
+            marksSection.slideDown();
+        } else {
+            marksSection.slideUp();
+        }
+    });
+
+    // Initialize marks sections based on current status
+    $('select[name="status"]').each(function() {
+        var marksSection = $(this).closest('.modal-body').find('.marks-update-section');
+        if ($(this).val() === 'approved') {
+            marksSection.show();
+        } else {
+            marksSection.hide();
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% endblock %} 
