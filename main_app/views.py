@@ -58,7 +58,7 @@ def doLogin(request, **kwargs):
 
         
         #Authenticate
-        email = request.POST.get('email')
+        email = request.POST.get('email').lower() if request.POST.get('email') else None
         password = request.POST.get('password')
         print(f"DEBUG: Attempting login for email: {email}")
         
