@@ -23,3 +23,6 @@ six==1.17.0
 sqlparse==0.5.3
 urllib3==2.3.0
 whitenoise==5.2.0
+reportlab==4.0.7
+pypdf==5.4.0
+xhtml2pdf==0.2.16
