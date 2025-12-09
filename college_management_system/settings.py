@@ -175,4 +175,4 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'majidgt786@gmail.com')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'sshswdwuwaokhghd')
 EMAIL_USE_TLS = True
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.WhiteNoiseStaticFilesStorage'

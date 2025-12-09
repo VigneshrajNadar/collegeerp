@@ -3,16 +3,24 @@
     "builds": [
         {
             "src": "vercel_app.py",
-            "use": "@vercel/python",
-            "config": {
-                "maxLambdaSize": "15mb",
-                "runtime": "python3.9"
-            }
+            "use": "@vercel/python"
+        },
+        {
+            "src": "static/**",
+            "use": "@vercel/static"
+        },
+        {
+            "src": "staticfiles/**",
+            "use": "@vercel/static"
         }
     ],
     "routes": [
         {
             "src": "/static/(.*)",
+            "dest": "/static/$1"
+        },
+        {
+            "src": "/staticfiles/(.*)",
             "dest": "/staticfiles/$1"
         },
         {
@@ -25,10 +33,6 @@
         }
     ],
     "env": {
-        "DJANGO_SETTINGS_MODULE": "college_management_system.settings",
-        "PYTHONPATH": "/var/task"
-    },
-    "regions": [
-        "bom1"
-    ]
+        "DJANGO_SETTINGS_MODULE": "college_management_system.settings"
+    }
 }
