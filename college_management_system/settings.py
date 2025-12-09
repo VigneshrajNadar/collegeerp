@@ -109,7 +109,8 @@ WSGI_APPLICATION = 'college_management_system.wsgi.application'
 DATABASES = {
     'default': dj_database_url.config(
         default='sqlite:///db.sqlite3',
-        conn_max_age=600
+        conn_max_age=0 if 'VERCEL' in os.environ else 600,
+        ssl_require='VERCEL' in os.environ
     )
 }
 
@@ -176,3 +177,12 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'sshswdwuwaokhghd')
 EMAIL_USE_TLS = True
 
 STATICFILES_STORAGE = 'whitenoise.storage.WhiteNoiseStaticFilesStorage'
+
+# Session configuration for Vercel
+if 'VERCEL' in os.environ:
+    SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = False  # Vercel handles SSL
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
