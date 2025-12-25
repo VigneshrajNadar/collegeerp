@@ -43,7 +43,7 @@ The **College ERP System** is designed to bridge the gap between students, staff
 *   **Frontend**: HTML5, CSS3, JavaScript, Bootstrap, AdminLTE
 *   **Database**: SQLite (Development), PostgreSQL (Production)
 *   **PDF Generation**: xhtml2pdf
-*   **Deployment**: Render / Heroku
+
 
 ---
 
@@ -124,18 +124,4 @@ College-ERP/
 └── manage.py                   # Django management script
 ```
 
----
-
-## ☁️ Deployment
-
-This project is configured for easy deployment on **Render**.
-
-1.  Push your code to GitHub.
-2.  Create a new Web Service on Render.
-3.  Connect your repository.
-4.  Render will automatically detect the `render.yaml` configuration.
-
-For a detailed guide, check out [DEPLOYMENT.md](deployment_guide.md).
-
----
 
